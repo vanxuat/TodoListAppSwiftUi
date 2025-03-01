@@ -17,23 +17,34 @@ import Foundation
  */
 
 class ListViewModel: ObservableObject {
-    @Published var items: [ItemsModel] = []
-    
+    @Published var items: [ItemsModel] = [] {
+        didSet {
+            saveItems()
+        }
+    }
+    let itemKey: String = "items_list"
     init() {
         getItems()
     }
     
     func getItems() {
-        let newItems = [
-            ItemsModel(title: "This is first title", isComplete: false),
-            ItemsModel(title: "This is the second", isComplete: true),
-            ItemsModel(title: "Thrid", isComplete: false)
-        ]
-        items.append(contentsOf: newItems)
+//        let newItems = [
+//            ItemsModel(title: "This is first title", isComplete: false),
+//            ItemsModel(title: "This is the second", isComplete: true),
+//            ItemsModel(title: "Thrid", isComplete: false)
+//        ]
+//        items.append(contentsOf: newItems)
+        guard let data = UserDefaults.standard.data(forKey: itemKey) ,
+        let saveItems = try? JSONDecoder().decode([ItemsModel].self, from: data)
+        else  {return}
+      
+        items = saveItems
+        
     }
     
     func deleteItem( indexSet: IndexSet){
         items.remove(atOffsets: indexSet)
+       
     }
     
     func moveItem(from: IndexSet, to: Int){
@@ -51,6 +62,12 @@ class ListViewModel: ObservableObject {
        } {
            items[index] = item.updateCompletion()
        }
-        
     }
+    
+    func saveItems() {
+        if let encodeaData = try? JSONEncoder().encode(items) {
+            UserDefaults.standard.set(encodeaData, forKey: itemKey)
+        }
+    }
+    
 }

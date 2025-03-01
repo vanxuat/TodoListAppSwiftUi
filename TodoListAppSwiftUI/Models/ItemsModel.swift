@@ -6,7 +6,7 @@
 //
 
 import Foundation
-struct ItemsModel: Identifiable {
+struct ItemsModel: Identifiable, Codable {
     let id: String
     let title: String
     let isComplete: Bool
